@@ -58,7 +58,9 @@ class _SplashScreenState extends State<SplashScreen>
 
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        decoration: BoxDecoration(
+          gradient: AppTheme.backgroundGradientFor(context),
+        ),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -88,7 +90,7 @@ class _SplashScreenState extends State<SplashScreen>
                           'one tap away.',
                           textAlign: TextAlign.center,
                           style: textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.6),
+                            color: AppTheme.mutedForegroundFor(context),
                             height: 1.5,
                           ),
                         ),
@@ -109,7 +111,7 @@ class _SplashScreenState extends State<SplashScreen>
                           'Powered by the public iptv-org API',
                           textAlign: TextAlign.center,
                           style: textTheme.bodySmall?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.35),
+                            color: AppTheme.mutedForegroundFor(context),
                           ),
                         ),
                       ],

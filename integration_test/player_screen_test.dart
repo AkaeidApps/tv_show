@@ -11,7 +11,7 @@ import 'package:tv_show/data/models/stream_model.dart';
 import 'package:tv_show/features/library/providers/library_provider.dart';
 import 'package:tv_show/features/player/presentation/player_screen.dart';
 
-/// End-to-end check of the real player screen against live IPTV sources.
+/// End-to-end check of the player screen with a stable HLS test stream.
 ///
 /// Run on a device/desktop with:
 ///   flutter test integration_test/player_screen_test.dart -d linux
@@ -34,20 +34,20 @@ void main() {
   }
 
   const channel = ChannelModel(
-    id: 'al-iraqia-sport.iq',
-    name: 'Al Iraqia Sport',
-    country: 'IQ',
-    categories: ['sports'],
+    id: 'hls-test',
+    name: 'HLS Test Stream',
+    country: 'US',
+    categories: ['general'],
     streams: [
       StreamModel(
-        channelId: 'al-iraqia-sport.iq',
-        url: 'https://imn-live.esite-lab.com/hls/iraqia-sports-1.m3u8',
+        channelId: 'hls-test',
+        url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
         quality: '720p',
       ),
     ],
   );
 
-  testWidgets('player screen plays a live sports channel', (tester) async {
+  testWidgets('player screen plays an HLS stream', (tester) async {
     await tester.pumpWidget(
       ChangeNotifierProvider<LibraryProvider>(
         create: (_) => LibraryProvider(),

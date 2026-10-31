@@ -26,26 +26,26 @@ class ChannelSearchField extends StatelessWidget {
         controller: controller,
         onChanged: onChanged,
         textInputAction: TextInputAction.search,
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        style: TextStyle(color: AppTheme.foregroundFor(context), fontSize: 14),
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
-            color: Colors.white.withValues(alpha: 0.35),
+            color: AppTheme.mutedForegroundFor(context),
             fontSize: 14,
           ),
           prefixIcon: AppIcon(
             AppIcons.search,
-            color: Colors.white.withValues(alpha: 0.45),
+            color: AppTheme.mutedForegroundFor(context),
           ),
           suffixIcon: controller.text.isEmpty
               ? null
               : IconButton(
                   onPressed: onClear,
                   icon: const AppIcon(AppIcons.close, size: 18),
-                  color: Colors.white54,
+                  color: AppTheme.mutedForegroundFor(context),
                 ),
           filled: true,
-          fillColor: Colors.white.withValues(alpha: 0.05),
+          fillColor: AppTheme.surfaceFor(context),
           contentPadding: const EdgeInsets.symmetric(vertical: 14),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
@@ -53,7 +53,9 @@ class ChannelSearchField extends StatelessWidget {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.06)),
+            borderSide: BorderSide(
+              color: AppTheme.foregroundFor(context).withValues(alpha: 0.08),
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),

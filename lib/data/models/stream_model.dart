@@ -28,10 +28,23 @@ class StreamModel {
 
   bool get isValid => channelId.isNotEmpty && url.isNotEmpty;
 
-  /// `video_player` only understands HTTP(S) sources (HLS/DASH/MP4).
+  /// Protocols supported by the app's FVP/FFmpeg playback backend.
   bool get isSupportedProtocol {
-    final scheme = Uri.tryParse(url)?.scheme.toLowerCase();
-    return scheme == 'http' || scheme == 'https';
+    final uri = Uri.tryParse(url);
+    if (uri == null || !uri.hasAuthority || uri.host.isEmpty) return false;
+
+    return const {
+      'http',
+      'https',
+      'rtsp',
+      'rtsps',
+      'rtmp',
+      'rtmps',
+      'rtp',
+      'udp',
+      'srt',
+      'mmsh',
+    }.contains(uri.scheme.toLowerCase());
   }
 
   bool get isSecure => url.toLowerCase().startsWith('https://');

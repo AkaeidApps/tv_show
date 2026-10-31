@@ -104,12 +104,29 @@ void main() {
   });
 
   group('StreamModel', () {
-    test('only supports http(s) sources', () {
-      const hls = StreamModel(channelId: 'A.bd', url: 'https://a/live.m3u8');
-      const rtmp = StreamModel(channelId: 'A.bd', url: 'rtmp://a/live');
+    test('supports network schemes handled by the FVP backend', () {
+      const sources = [
+        StreamModel(channelId: 'A.bd', url: 'https://a/live.m3u8'),
+        StreamModel(channelId: 'A.bd', url: 'rtsp://a/live'),
+        StreamModel(channelId: 'A.bd', url: 'rtmp://a/live'),
+        StreamModel(channelId: 'A.bd', url: 'rtp://a/live'),
+        StreamModel(channelId: 'A.bd', url: 'udp://a/live'),
+        StreamModel(channelId: 'A.bd', url: 'srt://a/live'),
+        StreamModel(channelId: 'A.bd', url: 'mmsh://a/live'),
+      ];
 
-      expect(hls.isSupportedProtocol, isTrue);
-      expect(rtmp.isSupportedProtocol, isFalse);
+      expect(sources.every((source) => source.isSupportedProtocol), isTrue);
+    });
+
+    test('rejects unsupported and malformed stream URLs', () {
+      const localFile = StreamModel(
+        channelId: 'A.bd',
+        url: 'file:///tmp/live.m3u8',
+      );
+      const malformed = StreamModel(channelId: 'A.bd', url: 'https:');
+
+      expect(localFile.isSupportedProtocol, isFalse);
+      expect(malformed.isSupportedProtocol, isFalse);
     });
   });
 }

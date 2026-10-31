@@ -37,13 +37,16 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
-  testWidgets('bottom navigation exposes the four tabs', (tester) async {
+  testWidgets('bottom navigation exposes country and recent tabs', (
+    tester,
+  ) async {
     await tester.pumpWidget(const TvShowApp());
     await tester.pump(const Duration(seconds: 3));
     await tester.pump();
 
     expect(find.text('Home'), findsOneWidget);
-    expect(find.text('Favorite'), findsOneWidget);
+    expect(find.text('Country'), findsOneWidget);
+    expect(find.text('Recent'), findsOneWidget);
     expect(find.text('Sports'), findsOneWidget);
     expect(find.text('Saved'), findsOneWidget);
 

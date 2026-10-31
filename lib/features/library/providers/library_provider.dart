@@ -13,16 +13,25 @@ class LibraryProvider extends ChangeNotifier {
     unawaited(_restore());
   }
 
+  void _trimRecent() {
+    if (_recentIds.length > _maxSaved) {
+      _recentIds.removeRange(_maxSaved, _recentIds.length);
+    }
+  }
+
   static const String _favoritesKey = 'library.favorites.v1';
   static const String _savedKey = 'library.saved.v1';
+  static const String _recentKey = 'library.recent.v1';
   static const int _maxSaved = 100;
 
   final List<String> _favoriteIds = [];
   final List<String> _savedIds = [];
+  final List<String> _recentIds = [];
   bool _restored = false;
 
   List<String> get favoriteIds => List.unmodifiable(_favoriteIds);
   List<String> get savedIds => List.unmodifiable(_savedIds);
+  List<String> get recentIds => List.unmodifiable(_recentIds);
   int get favoriteCount => _favoriteIds.length;
   int get savedCount => _savedIds.length;
   bool get isReady => _restored;
@@ -51,8 +60,9 @@ class LibraryProvider extends ChangeNotifier {
 
   /// Records that a channel was opened. Saved channels are ordered by recency.
   void recordWatched(String channelId) {
-    if (_savedIds.isNotEmpty && _savedIds.first == channelId) return;
-
+    _recentIds.remove(channelId);
+    _recentIds.insert(0, channelId);
+    _trimRecent();
     _savedIds.remove(channelId);
     _savedIds.insert(0, channelId);
     _trimSaved();
@@ -87,7 +97,11 @@ class LibraryProvider extends ChangeNotifier {
       _savedIds
         ..clear()
         ..addAll(prefs.getStringList(_savedKey) ?? const []);
+      _recentIds
+        ..clear()
+        ..addAll(prefs.getStringList(_recentKey) ?? const []);
       _trimSaved();
+      _trimRecent();
     } catch (_) {
       // No platform store available: keep the in-memory state only.
     } finally {
@@ -101,6 +115,7 @@ class LibraryProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList(_favoritesKey, _favoriteIds);
       await prefs.setStringList(_savedKey, _savedIds);
+      await prefs.setStringList(_recentKey, _recentIds);
     } catch (_) {
       // Ignore: the in-memory lists are still correct for this session.
     }

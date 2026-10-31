@@ -14,7 +14,6 @@ void main() {
   final streams = <String, String>{
     'mux-hls': 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
     'iraqia-sports': 'https://imn-live.esite-lab.com/hls/iraqia-sports-1.m3u8',
-    '30a-golf': 'https://30a-tv.com/feeds/vidaa/golf.m3u8',
     'acc-digital': 'https://raycom-accdn-firetv.amagi.tv/playlist.m3u8',
   };
 

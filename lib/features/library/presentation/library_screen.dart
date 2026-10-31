@@ -12,7 +12,7 @@ import '../../channels/providers/channels_provider.dart';
 import '../providers/library_provider.dart';
 
 /// Which persisted list the screen renders.
-enum LibraryTab { favorites, saved }
+enum LibraryTab { favorites, saved, recent }
 
 /// Favourites and Saved tabs, both backed by [LibraryProvider].
 class LibraryScreen extends StatelessWidget {
@@ -25,23 +25,41 @@ class LibraryScreen extends StatelessWidget {
     final library = context.watch<LibraryProvider>();
     final catalogue = context.watch<ChannelsProvider>();
 
-    final ids = tab == LibraryTab.favorites
-        ? library.favoriteIds
-        : library.savedIds;
+    final ids = switch (tab) {
+      LibraryTab.favorites => library.favoriteIds,
+      LibraryTab.saved => library.savedIds,
+      LibraryTab.recent => library.recentIds,
+    };
     final channels = catalogue.channelsForIds(ids);
 
     final isFavorites = tab == LibraryTab.favorites;
+    final isRecent = tab == LibraryTab.recent;
 
     return DecoratedBox(
-      decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+      decoration: BoxDecoration(
+        gradient: AppTheme.backgroundGradientFor(context),
+      ),
       child: SafeArea(
         bottom: false,
         child: Column(
           children: [
             TabHeader(
-              title: isFavorites ? 'Favourites' : 'Saved',
-              subtitle: _subtitle(channels.length, catalogue, isFavorites),
-              icon: isFavorites ? AppIcons.favorite : AppIcons.bookmark,
+              title: isFavorites
+                  ? 'Favourites'
+                  : isRecent
+                  ? 'Recently watched'
+                  : 'Saved',
+              subtitle: _subtitle(
+                channels.length,
+                catalogue,
+                isFavorites,
+                isRecent,
+              ),
+              icon: isFavorites
+                  ? AppIcons.favorite
+                  : isRecent
+                  ? AppIcons.playCircle
+                  : AppIcons.bookmark,
               gradient: isFavorites
                   ? const LinearGradient(
                       begin: Alignment.topLeft,
@@ -63,13 +81,19 @@ class LibraryScreen extends StatelessWidget {
     );
   }
 
-  String _subtitle(int count, ChannelsProvider catalogue, bool isFavorites) {
+  String _subtitle(
+    int count,
+    ChannelsProvider catalogue,
+    bool isFavorites,
+    bool isRecent,
+  ) {
     if (catalogue.isLoading && !catalogue.hasChannels) {
       return 'Loading your channels…';
     }
     if (count == 0) {
-      return isFavorites
-          ? 'Tap the heart on any channel'
+      if (isFavorites) return 'Tap the heart on any channel';
+      return isRecent
+          ? 'Channels you watch appear here'
           : 'Channels you open are saved here';
     }
     return '$count ${count == 1 ? 'channel' : 'channels'}';
@@ -94,10 +118,17 @@ class LibraryScreen extends StatelessWidget {
     }
 
     if (channels.isEmpty) {
+      final isRecent = tab == LibraryTab.recent;
       return ChannelEmptyState(
-        icon: isFavorites ? AppIcons.favoriteBorder : AppIcons.bookmarkBorder,
+        icon: isFavorites
+            ? AppIcons.favoriteBorder
+            : isRecent
+            ? AppIcons.playCircleOutline
+            : AppIcons.bookmarkBorder,
         message: isFavorites
             ? 'No favourites yet.\nTap the heart on a channel to keep it here.'
+            : isRecent
+            ? 'No recent channels yet.\nStart watching a channel to see it here.'
             : 'No saved channels yet.\nLong-press any channel to save it, '
                   'or simply watch it once.',
         action: FilledButton.icon(

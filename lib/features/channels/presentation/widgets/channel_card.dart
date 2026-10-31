@@ -86,16 +86,19 @@ class _ChannelCardState extends State<ChannelCard> {
             borderRadius: BorderRadius.circular(18),
             child: Ink(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
+                gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [AppTheme.surface, AppTheme.surfaceHigh],
+                  colors: [
+                    AppTheme.surfaceFor(context),
+                    AppTheme.surfaceHighFor(context),
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
                   color: _highlighted
                       ? AppTheme.primary
-                      : Colors.white.withValues(alpha: 0.06),
+                      : AppTheme.foregroundFor(context).withValues(alpha: 0.08),
                   width: _highlighted ? 1.5 : 1,
                 ),
                 boxShadow: _highlighted
@@ -126,13 +129,16 @@ class _ChannelCardState extends State<ChannelCard> {
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                   colors: [
-                                    Colors.white.withValues(alpha: 0.12),
-                                    Colors.white.withValues(alpha: 0.03),
+                                    AppTheme.foregroundFor(context)
+                                        .withValues(alpha: 0.12),
+                                    AppTheme.foregroundFor(context)
+                                        .withValues(alpha: 0.03),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.05),
+                                  color: AppTheme.foregroundFor(context)
+                                      .withValues(alpha: 0.06),
                                 ),
                               ),
                               child: ChannelLogo(channel: channel),
@@ -155,8 +161,8 @@ class _ChannelCardState extends State<ChannelCard> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppTheme.foregroundFor(context),
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
@@ -192,7 +198,7 @@ class _ChannelCardState extends State<ChannelCard> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.45),
+                              color: AppTheme.mutedForegroundFor(context),
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.8,
@@ -231,7 +237,9 @@ class _FavoriteButton extends StatelessWidget {
           child: AppIcon(
             isFavorite ? AppIcons.favorite : AppIcons.favoriteBorder,
             size: 16,
-            color: isFavorite ? AppTheme.accent : Colors.white70,
+            color: isFavorite
+                ? AppTheme.accent
+                : AppTheme.foregroundFor(context).withValues(alpha: 0.72),
           ),
         ),
       ),

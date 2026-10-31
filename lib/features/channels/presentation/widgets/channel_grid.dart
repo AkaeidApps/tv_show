@@ -52,7 +52,7 @@ class ChannelGrid extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: refresh,
       color: AppTheme.primary,
-      backgroundColor: AppTheme.surface,
+      backgroundColor: AppTheme.surfaceFor(context),
       child: grid,
     );
   }
@@ -82,13 +82,16 @@ class ChannelEmptyState extends StatelessWidget {
             AppIcon(
               icon,
               size: 48,
-              color: Colors.white.withValues(alpha: 0.35),
+              color: AppTheme.mutedForegroundFor(context),
             ),
             const SizedBox(height: 16),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white70, height: 1.4),
+              style: TextStyle(
+                color: AppTheme.mutedForegroundFor(context),
+                height: 1.4,
+              ),
             ),
             if (action != null) ...[const SizedBox(height: 20), action!],
           ],

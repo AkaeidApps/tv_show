@@ -8,6 +8,7 @@ import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_settings_provider.dart';
 import '../../../data/models/channel_model.dart';
 import '../../../data/models/stream_model.dart';
 import '../../../features/library/providers/library_provider.dart';
@@ -27,7 +28,8 @@ class PlayerScreen extends StatefulWidget {
 
 class _PlayerScreenState extends State<PlayerScreen>
     with WidgetsBindingObserver {
-  static const Duration _sourceTimeout = Duration(seconds: 12);
+  // Community IPTV servers can take tens of seconds before the first frame.
+  static const Duration _sourceTimeout = Duration(seconds: 40);
   static const Duration _retryDelay = Duration(milliseconds: 350);
 
   /// Many IPTV servers reject the default ExoPlayer user agent, so a common
@@ -47,6 +49,7 @@ class _PlayerScreenState extends State<PlayerScreen>
   bool _isFullscreen = false;
   bool _controlsVisible = true;
   bool _muted = false;
+  bool _wasBuffering = false;
   String? _error;
 
   Timer? _hideControlsTimer;
@@ -57,7 +60,17 @@ class _PlayerScreenState extends State<PlayerScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    _sources = widget.channel.streams.take(12).toList(growable: false);
+    final preferredQuality = context.read<AppSettingsProvider>().videoQuality;
+    _sources = widget.channel.streams.toList();
+    if (preferredQuality != 'Auto') {
+      final qualityNumber = preferredQuality.replaceAll(RegExp(r'[^0-9]'), '');
+      _sources.sort((first, second) {
+        final firstMatches = first.quality?.contains(qualityNumber) ?? false;
+        final secondMatches = second.quality?.contains(qualityNumber) ?? false;
+        if (firstMatches == secondMatches) return 0;
+        return firstMatches ? -1 : 1;
+      });
+    }
 
     unawaited(WakelockPlus.enable().catchError((Object _) {}));
 
@@ -116,6 +129,8 @@ class _PlayerScreenState extends State<PlayerScreen>
     if (!mounted) return;
 
     _bufferingWatchdog?.cancel();
+    _bufferingWatchdog = null;
+    _wasBuffering = false;
     _failoverScheduled = false;
 
     if (index >= _sources.length) {
@@ -200,7 +215,7 @@ class _PlayerScreenState extends State<PlayerScreen>
         _controller = controller;
         _isLoading = false;
       });
-      _startBufferingWatchdog();
+      _onControllerValueChanged();
       _scheduleHideControls();
     } catch (_) {
       await _disposeController(controller);
@@ -248,7 +263,18 @@ class _PlayerScreenState extends State<PlayerScreen>
     final controller = _controller;
     if (controller == null || !mounted) return;
 
-    if (!controller.value.isBuffering) _bufferingWatchdog?.cancel();
+    if (controller.value.hasError) {
+      _wasBuffering = false;
+      _bufferingWatchdog?.cancel();
+      _bufferingWatchdog = null;
+    } else if (controller.value.isBuffering && !_wasBuffering) {
+      _wasBuffering = true;
+      _startBufferingWatchdog(controller);
+    } else if (!controller.value.isBuffering) {
+      _wasBuffering = false;
+      _bufferingWatchdog?.cancel();
+      _bufferingWatchdog = null;
+    }
 
     if (!controller.value.hasError || _error != null) return;
 
@@ -268,16 +294,27 @@ class _PlayerScreenState extends State<PlayerScreen>
     });
   }
 
-  void _startBufferingWatchdog() {
+  void _startBufferingWatchdog(VideoPlayerController controller) {
     _bufferingWatchdog?.cancel();
     _bufferingWatchdog = Timer(const Duration(seconds: 20), () {
-      final controller = _controller;
-      if (!mounted || controller == null) return;
-      if (!controller.value.isBuffering) return;
+      if (!mounted ||
+          !identical(_controller, controller) ||
+          !controller.value.isBuffering) {
+        return;
+      }
+
+      _bufferingWatchdog = null;
       if (_sourceIndex + 1 < _sources.length && !_failoverScheduled) {
         _failoverScheduled = true;
         unawaited(_playSource(_sourceIndex + 1));
+        return;
       }
+
+      setState(() {
+        _error = 'This stream is still buffering. Try another source.';
+        _isLoading = false;
+        _controlsVisible = true;
+      });
     });
   }
 

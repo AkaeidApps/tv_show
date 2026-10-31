@@ -74,11 +74,9 @@ class IptvRemoteDataSource {
       final logos = logosByChannel[channel.id];
       if (logos != null && logos.isNotEmpty) channel = channel.withLogos(logos);
 
-      // Keep the best handful of sources; enough to fail over without
-      // bloating the in-memory catalogue.
-      channels.add(
-        channel.withStreams(streams.take(12).toList(growable: false)),
-      );
+      // Keep every source so playback can fail over past stale or geo-blocked
+      // endpoints instead of hiding working alternatives after an arbitrary cap.
+      channels.add(channel.withStreams(streams.toList(growable: false)));
     }
 
     channels.sort(

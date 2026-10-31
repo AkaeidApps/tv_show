@@ -45,7 +45,9 @@ class _SportsScreenState extends State<SportsScreen> {
     final sports = _filter(provider.sportsChannels);
 
     return DecoratedBox(
-      decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+      decoration: BoxDecoration(
+        gradient: AppTheme.backgroundGradientFor(context),
+      ),
       child: SafeArea(
         bottom: false,
         child: Column(

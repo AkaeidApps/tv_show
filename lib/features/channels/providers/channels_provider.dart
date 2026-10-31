@@ -16,6 +16,7 @@ class ChannelsProvider extends ChangeNotifier {
   Map<String, ChannelModel> _byId = const {};
   List<String> _countries = const [];
   String _selectedCountry = CountryFilter.allCountries;
+  String _selectedCategory = 'Discover';
   String _query = '';
   bool _isLoading = false;
   String? _error;
@@ -26,6 +27,7 @@ class ChannelsProvider extends ChangeNotifier {
   List<ChannelModel> get sportsChannels => _sportsChannels;
   List<String> get countries => _countries;
   String get selectedCountry => _selectedCountry;
+  String get selectedCategory => _selectedCategory;
   String get query => _query;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -84,6 +86,13 @@ class ChannelsProvider extends ChangeNotifier {
     _notify();
   }
 
+  void selectCategory(String category) {
+    if (_selectedCategory == category) return;
+    _selectedCategory = category;
+    _applyFilters();
+    _notify();
+  }
+
   void search(String query) {
     if (_query == query) return;
     _query = query;
@@ -96,11 +105,30 @@ class ChannelsProvider extends ChangeNotifier {
   Future<void> refresh() => loadChannels(forceRefresh: true);
 
   void _applyFilters() {
-    _visibleChannels = CountryFilter.apply(
+    final countryAndQueryFiltered = CountryFilter.apply(
       _allChannels,
       countryCode: _selectedCountry,
       query: _query,
     );
+    final category = _selectedCategory.toLowerCase();
+    final categoryTerms = switch (category) {
+      'football' => const ['football', 'soccer'],
+      'cartoon' => const ['cartoon', 'animation', 'kids', 'children'],
+      _ => [category],
+    };
+    _visibleChannels = category == 'discover' || category == 'live tv'
+        ? countryAndQueryFiltered
+        : countryAndQueryFiltered
+              .where(
+                (channel) => categoryTerms.any(
+                  (term) =>
+                      channel.name.toLowerCase().contains(term) ||
+                      channel.categories.any(
+                        (item) => item.toLowerCase().contains(term),
+                      ),
+                ),
+              )
+              .toList(growable: false);
   }
 
   void _notify() {
