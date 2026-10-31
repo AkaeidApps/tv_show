@@ -21,18 +21,19 @@ class LogoModel {
 
   bool get isValid => channelId.isNotEmpty && url.isNotEmpty;
 
-  /// True when the entry points at an actual image we can render.
-  ///
-  /// A handful of iptv-org entries point at HTML pages (for example an imgur
-  /// gallery link) instead of an image file. Rendering those always fails, so
-  /// they are dropped before they reach the widget tree.
+  /// True for a known image format or a non-root URL on an extensionless CDN.
+  /// Invalid HTML responses are handled by the logo widget's error fallback.
   bool get isUsable {
     final uri = Uri.tryParse(url);
     if (uri == null || (uri.scheme != 'http' && uri.scheme != 'https')) {
       return false;
     }
-    if (format != null && format!.trim().isNotEmpty) return true;
-    return _extension.isNotEmpty || _isKnownImageHost(uri.host);
+    if (_format.isNotEmpty && !_imageFormats.contains(_format)) return false;
+    if (_imageFormats.contains(_format) ||
+        _imageExtensions.contains(_extension)) {
+      return true;
+    }
+    return uri.pathSegments.any((segment) => segment.isNotEmpty);
   }
 
   /// Direct image URL. Imgur gallery links are rewritten to the image CDN so
@@ -60,6 +61,7 @@ class LogoModel {
       case 'JPEG':
       case 'JPG':
       case 'WEBP':
+      case 'AVIF':
       case 'GIF':
       case 'APNG':
         return true;
@@ -69,6 +71,7 @@ class LogoModel {
       'jpg',
       'jpeg',
       'webp',
+      'avif',
       'gif',
       'apng',
     }.contains(_extension);
@@ -93,27 +96,35 @@ class LogoModel {
     return width * height > other.width * other.height;
   }
 
-  String get _format => (format ?? '').toUpperCase();
+  static const _imageFormats = {
+    'PNG',
+    'JPEG',
+    'JPG',
+    'SVG',
+    'WEBP',
+    'AVIF',
+    'GIF',
+    'APNG',
+  };
+
+  static const _imageExtensions = {
+    'png',
+    'jpg',
+    'jpeg',
+    'svg',
+    'webp',
+    'avif',
+    'gif',
+    'apng',
+  };
+
+  String get _format => (format ?? '').trim().toUpperCase();
 
   String get _extension {
     final path = Uri.tryParse(url)?.path ?? url;
     final dot = path.lastIndexOf('.');
     if (dot == -1 || dot == path.length - 1) return '';
     return path.substring(dot + 1).toLowerCase();
-  }
-
-  static bool _isKnownImageHost(String host) {
-    const hosts = {
-      'i.imgur.com',
-      'imgur.com',
-      'www.imgur.com',
-      'images.pluto.tv',
-      'upload.wikimedia.org',
-      'static.wikia.nocookie.net',
-      'i.ibb.co',
-      'raw.githubusercontent.com',
-    };
-    return hosts.contains(host.toLowerCase());
   }
 
   factory LogoModel.fromJson(Map<String, dynamic> json) {

@@ -1,11 +1,27 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tv_show/app/app.dart';
+import 'package:tv_show/shared/icons/app_icons.dart';
 
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+  });
+
+  testWidgets('every bundled SVG icon loads', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SingleChildScrollView(
+          child: Wrap(
+            children: [for (final asset in AppIcons.all) AppIcon(asset)],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('splash screen shows the brand and call to action', (

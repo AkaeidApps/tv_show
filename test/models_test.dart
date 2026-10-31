@@ -16,9 +16,27 @@ void main() {
     });
 
     test('rejects HTML pages that are not images', () {
-      const logo = LogoModel(channelId: 'Canal.br', url: 'https://luna.ink/');
+      const rootPage = LogoModel(
+        channelId: 'Canal.br',
+        url: 'https://luna.ink/',
+      );
+      const htmlFile = LogoModel(
+        channelId: 'Canal.br',
+        url: 'https://cdn.example.com/logo.html',
+        format: 'HTML',
+      );
 
-      expect(logo.isUsable, isFalse);
+      expect(rootPage.isUsable, isFalse);
+      expect(htmlFile.isUsable, isFalse);
+    });
+
+    test('accepts extensionless URLs from image CDNs', () {
+      const logo = LogoModel(
+        channelId: 'A.bd',
+        url: 'https://cdn.example.com/images/logo/12345',
+      );
+
+      expect(logo.isUsable, isTrue);
     });
 
     test('accepts image URLs even without a format field', () {

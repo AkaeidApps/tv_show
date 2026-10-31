@@ -38,6 +38,37 @@ abstract final class AppIcons {
 
   /// The brand mark used by the splash screen.
   static const String brandMark = 'assets/branding/brand_mark.svg';
+
+  static const List<String> all = [
+    arrowBack,
+    bookmark,
+    bookmarkBorder,
+    close,
+    equalizer,
+    explore,
+    favorite,
+    favoriteBorder,
+    fullscreen,
+    fullscreenExit,
+    liveTv,
+    liveTvOutlined,
+    pause,
+    playArrow,
+    playCircle,
+    playCircleOutline,
+    playlistPlay,
+    refresh,
+    search,
+    searchOff,
+    skipNext,
+    sportsSoccer,
+    sportsSoccerOutlined,
+    tvOff,
+    volumeOff,
+    volumeUp,
+    wifiOff,
+    brandMark,
+  ];
 }
 
 /// Renders an [AppIcons] asset exactly like a Material [Icon] would: it picks

@@ -11,6 +11,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../data/models/channel_model.dart';
 import '../../../data/models/stream_model.dart';
 import '../../../features/library/providers/library_provider.dart';
+import '../../../shared/icons/app_icons.dart';
 import '../../../shared/widgets/channel_logo.dart';
 
 /// Full screen player with YouTube style controls and automatic failover
@@ -405,7 +406,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                 padding: EdgeInsets.fromLTRB(20, 0, 20, 8),
                 child: Row(
                   children: [
-                    Icon(Icons.playlist_play_rounded, size: 20),
+                    AppIcon(AppIcons.playlistPlay, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'Choose a source',
@@ -426,10 +427,10 @@ class _PlayerScreenState extends State<PlayerScreen>
                     final current = index == _sourceIndex;
                     return ListTile(
                       selected: current,
-                      leading: Icon(
+                      leading: AppIcon(
                         current
-                            ? Icons.play_circle_fill_rounded
-                            : Icons.play_circle_outline_rounded,
+                            ? AppIcons.playCircle
+                            : AppIcons.playCircleOutline,
                         color: current ? AppTheme.primary : Colors.white54,
                       ),
                       title: Text(
@@ -449,7 +450,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                         ),
                       ),
                       trailing: current
-                          ? const Icon(Icons.equalizer_rounded, size: 18)
+                          ? const AppIcon(AppIcons.equalizer, size: 18)
                           : null,
                       onTap: () => Navigator.of(context).pop(index),
                     );
@@ -582,8 +583,8 @@ class _PlayerScreenState extends State<PlayerScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.tv_off_rounded,
+            AppIcon(
+              AppIcons.tvOff,
               size: 64,
               color: Colors.white.withValues(alpha: 0.4),
             ),
@@ -597,13 +598,13 @@ class _PlayerScreenState extends State<PlayerScreen>
             if (_sources.length > 1)
               FilledButton.icon(
                 onPressed: _showSourcePicker,
-                icon: const Icon(Icons.playlist_play_rounded),
+                icon: const AppIcon(AppIcons.playlistPlay),
                 label: const Text('Choose a source'),
               )
             else
               FilledButton.icon(
                 onPressed: _retry,
-                icon: const Icon(Icons.refresh_rounded),
+                icon: const AppIcon(AppIcons.refresh),
                 label: const Text('Try again'),
               ),
             const SizedBox(height: 8),
@@ -682,7 +683,7 @@ class _PlayerScreenState extends State<PlayerScreen>
                 IconButton(
                   onPressed: _handleBack,
                   tooltip: 'Back',
-                  icon: const Icon(Icons.arrow_back_rounded),
+                  icon: const AppIcon(AppIcons.arrowBack),
                 ),
                 const SizedBox(width: 4),
                 ChannelLogoBadge(channel: widget.channel, size: 34),
@@ -729,20 +730,18 @@ class _PlayerScreenState extends State<PlayerScreen>
                           tooltip: favorite
                               ? 'Remove from favourites'
                               : 'Add to favourites',
-                          icon: Icon(
+                          icon: AppIcon(
                             favorite
-                                ? Icons.favorite_rounded
-                                : Icons.favorite_border_rounded,
+                                ? AppIcons.favorite
+                                : AppIcons.favoriteBorder,
                             color: favorite ? AppTheme.accent : Colors.white,
                           ),
                         ),
                         IconButton(
                           onPressed: _toggleSaved,
                           tooltip: saved ? 'Remove from saved' : 'Save',
-                          icon: Icon(
-                            saved
-                                ? Icons.bookmark_rounded
-                                : Icons.bookmark_border_rounded,
+                          icon: AppIcon(
+                            saved ? AppIcons.bookmark : AppIcons.bookmarkBorder,
                             color: saved ? AppTheme.primary : Colors.white,
                           ),
                         ),
@@ -826,20 +825,18 @@ class _PlayerScreenState extends State<PlayerScreen>
                           onPressed: _togglePlay,
                           tooltip: value.isPlaying ? 'Pause' : 'Play',
                           iconSize: 26,
-                          icon: Icon(
+                          icon: AppIcon(
                             value.isPlaying
-                                ? Icons.pause_rounded
-                                : Icons.play_arrow_rounded,
+                                ? AppIcons.pause
+                                : AppIcons.playArrow,
                           ),
                         ),
                         IconButton(
                           onPressed: _toggleMute,
                           tooltip: _muted ? 'Unmute' : 'Mute',
                           iconSize: 22,
-                          icon: Icon(
-                            _muted
-                                ? Icons.volume_off_rounded
-                                : Icons.volume_up_rounded,
+                          icon: AppIcon(
+                            _muted ? AppIcons.volumeOff : AppIcons.volumeUp,
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -861,14 +858,14 @@ class _PlayerScreenState extends State<PlayerScreen>
                             onPressed: _showSourcePicker,
                             tooltip: 'Choose source',
                             iconSize: 24,
-                            icon: const Icon(Icons.playlist_play_rounded),
+                            icon: const AppIcon(AppIcons.playlistPlay),
                           ),
                         if (_sources.length > 1)
                           IconButton(
                             onPressed: _playNext,
                             tooltip: 'Next source',
                             iconSize: 24,
-                            icon: const Icon(Icons.skip_next_rounded),
+                            icon: const AppIcon(AppIcons.skipNext),
                           ),
                         IconButton(
                           onPressed: () => _setFullscreen(!_isFullscreen),
@@ -876,10 +873,10 @@ class _PlayerScreenState extends State<PlayerScreen>
                               ? 'Exit full screen'
                               : 'Full screen',
                           iconSize: 26,
-                          icon: Icon(
+                          icon: AppIcon(
                             _isFullscreen
-                                ? Icons.fullscreen_exit_rounded
-                                : Icons.fullscreen_rounded,
+                                ? AppIcons.fullscreenExit
+                                : AppIcons.fullscreen,
                           ),
                         ),
                       ],
@@ -923,7 +920,7 @@ class _BigPlayButton extends StatelessWidget {
         customBorder: const CircleBorder(),
         child: const Padding(
           padding: EdgeInsets.all(18),
-          child: Icon(Icons.play_arrow_rounded, size: 42, color: Colors.white),
+          child: AppIcon(AppIcons.playArrow, size: 42, color: Colors.white),
         ),
       ),
     );
